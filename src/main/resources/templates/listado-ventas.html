@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ventas | Panadería Cookie and Bread</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css">
+
+    <style>
+        .main-sidebar { background-color: #4b3621 !important; }
+        .nav-link.active { background-color: #d2691e !important; }
+        .brand-link { border-bottom: 1px solid #5d4037 !important; }
+        .btn-productos { background-color: #f39c12; color: black; font-weight: 500; }
+        .btn-productos:hover { background-color: #e67e22; color: white; }
+        /* Estilo para que la tabla se vea más limpia */
+        .table td, .table th { vertical-align: middle !important; }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Sidebar -->
+    <!-- Sidebar -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <a th:href="@{/auth/menu}" class="brand-link">
+            <i class="fas fa-bread-slice ml-3 mr-2" style="color: #f4a460;"></i>
+            <span class="brand-text font-weight-light"><b>Panadería</b> Sistema</span>
+        </a>
+        <div class="sidebar">
+            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                <div class="image d-flex align-items-center justify-content-center ml-2">
+                    <i class="fas fa-user-circle fa-2x text-light"></i>
+                </div>
+                <div class="info">
+                    <a href="#" class="d-block ml-2">Hola, <b th:text="${usuario.nombre}">Invitado</b></a>
+                </div>
+            </div>
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+                    <li class="nav-item"><a th:href="@{/auth/menu}" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Panel Principal</p></a></li>
+                    <li class="nav-item"><a th:href="@{/productos}" class="nav-link"><i class="nav-icon fas fa-box-open"></i><p>Inventario de Panes</p></a></li>
+                    <li class="nav-item"><a th:href="@{/ventas}" class="nav-link active"><i class="nav-icon fas fa-shopping-basket"></i><p>Registro de Ventas</p></a></li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Gestión de Ventas</h1>
+                    </div>
+                    <div class="col-sm-6 text-right">
+                        <a th:href="@{/ventas/nuevo}" class="btn btn-success px-4">
+                            <i class="fas fa-plus mr-1"></i> Nueva Venta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+
+                <!-- Buscador de Ventas Funcional -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <!-- El método GET envía el nombre a la URL como ?nombre=valor -->
+                        <form th:action="@{/ventas}" method="get">
+                            <div class="input-group">
+                                <!-- IMPORTANTE: name="nombre" debe coincidir con tu Controller -->
+                                <input type="text" name="nombre" class="form-control"
+                                       placeholder="Buscar por cliente..."
+                                       th:value="${param.nombre}">
+                                <div class="input-group-append">
+                                    <button class="btn btn-info" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+
+                                    <a th:href="@{/ventas}" class="btn btn-default">
+                                        <i class="fas fa-undo"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card card-outline card-orange">
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover table-striped text-center">
+                            <thead class="bg-light">
+                            <tr>
+                                <th style="width: 5%">ID</th>
+                                <th>Cliente</th>
+                                <th>Producto</th>
+                                <th>Cant.</th>
+                                <th>Total</th>
+                                <th style="width: 25%">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="venta : ${ventas}">
+                                <td th:text="${venta.id_ventas}" class="text-bold"></td>
+                                <td th:text="${venta.nombre}"></td>
+                                <!-- Mostramos el nombre del pan usando la relación @ManyToOne -->
+                                <td>
+                                    <span class="badge badge-info" th:text="${venta.producto.nombre}"></span>
+                                </td>
+                                <td th:text="${venta.cantidad}"></td>
+                                <td>
+                                    <span class="text-success text-bold" th:text="'$' + ${#numbers.formatDecimal(venta.total, 1, 2)}"></span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <!-- Botón Editar -->
+                                        <a th:href="@{/ventas/actualizar/{id}(id=${venta.id_ventas})}" class="btn btn-sm btn-productos" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                            </i-edit></a>
+
+                                        <!-- Botón Factura (Ruta: /ventas/factura/{id}) -->
+                                        <a th:href="@{/ventas/factura/{id}(id=${venta.id_ventas})}" class="btn btn-sm btn-primary" title="Ver Factura">
+                                            <i class="fas fa-file-invoice"></i>
+                                        </a>
+
+                                        <!-- Botón Eliminar -->
+                                        <a th:href="@{/ventas/eliminar/{id}(id=${venta.id_ventas})}"
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('¿Estás seguro de eliminar este registro de venta?')" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(ventas)}">
+                                <td colspan="6" class="py-5 text-muted">
+                                    <i class="fas fa-shopping-cart fa-3x mb-3"></i><br>
+                                    No hay ventas registradas aún.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Paginación -->
+                    <div class="card-footer clearfix">
+                        <ul class="pagination pagination-sm m-0 float-right">
+                            <li class="page-item"><a class="page-link" href="#">«</a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">»</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="main-footer text-sm">
+        <div class="float-right d-none d-sm-inline">
+            Sistema de Gestión v1.0
+        </div>
+        <strong>Panadería "Cookie and Bread" &copy; 2026.</strong>
+    </footer>
+</div>
+
+<script src="/plugins/jquery/jquery.min.js"></script>
+<script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/dist/js/adminlte.min.js"></script>
+</body>
+</html>

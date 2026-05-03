@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nueva Venta | Cookie and Bread</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css">
+
+    <style>
+        .main-sidebar { background-color: #4b3621 !important; }
+        .nav-link.active { background-color: #d2691e !important; }
+        .brand-link { border-bottom: 1px solid #5d4037 !important; }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Sidebar -->
+    <!-- Sidebar -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <a th:href="@{/auth/menu}" class="brand-link">
+            <i class="fas fa-bread-slice ml-3 mr-2" style="color: #f4a460;"></i>
+            <span class="brand-text font-weight-light"><b>Panadería</b> Sistema</span>
+        </a>
+        <div class="sidebar">
+            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                <div class="image d-flex align-items-center justify-content-center ml-2">
+                    <i class="fas fa-user-circle fa-2x text-light"></i>
+                </div>
+                <div class="info">
+                    <a href="#" class="d-block ml-2">Hola, <b th:text="${usuario.nombre}">Invitado</b></a>
+                </div>
+            </div>
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+                    <li class="nav-item"><a th:href="@{/auth/menu}" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Panel Principal</p></a></li>
+                    <li class="nav-item"><a th:href="@{/productos}" class="nav-link"><i class="nav-icon fas fa-box-open"></i><p>Inventario de Panes</p></a></li>
+                    <li class="nav-item"><a th:href="@{/ventas}" class="nav-link active"><i class="nav-icon fas fa-shopping-basket"></i><p>Registro de Ventas</p></a></li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <h1>Registrar Venta</h1>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <div class="card card-orange card-outline">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-cash-register mr-1"></i> Detalles del Ticket</h3>
+                            </div>
+
+                            <form th:action="@{/ventas/guardar}" th:object="${ventas}" method="post">
+                                <div class="card-body">
+
+                                    <!-- Nombre del Cliente -->
+                                    <div class="form-group">
+                                        <label for="nombre">Nombre del Cliente</label>
+                                        <input type="text" th:field="*{nombre}" class="form-control" id="nombre" placeholder="Nombre de quien compra" required>
+                                    </div>
+
+                                    <!-- Selección de Producto (Pan) -->
+                                    <div class="form-group">
+                                        <label for="producto">Seleccionar Pan</label>
+                                        <select th:field="*{producto}" class="form-control" id="productoSelect" required>
+                                            <option value="" disabled selected>-- Selecciona un pan --</option>
+                                            <!-- Iteramos sobre la lista que pasamos desde el Controller -->
+                                            <option th:each="p : ${listadoProductos}"
+                                                    th:value="${p.id_productos}"
+                                                    th:text="${p.nombre} + ' - $' + ${p.precio}"
+                                                    th:data-precio="${p.precio}">
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="row">
+                                        <!-- Cantidad -->
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="cantidad">Cantidad</label>
+                                                <input type="number" th:field="*{cantidad}" class="form-control" id="cantidadInput" min="1" value="1" required>
+                                            </div>
+                                        </div>
+                                        <!-- Total -->
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="total">Total a Pagar ($)</label>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                                    </div>
+                                                    <!-- th:field="*{total}" conecta con el double en tu entidad -->
+                                                    <input type="number" step="0.01" th:field="*{total}" class="form-control" id="totalInput" readonly required>
+                                                </div>
+                                                <small class="text-muted">Se calcula automáticamente.</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="card-footer">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-check-circle mr-1"></i> Finalizar Venta
+                                    </button>
+                                    <a th:href="@{/ventas}" class="btn btn-default float-right">Cancelar</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="main-footer">
+        <strong>Panadería "Cookie and Bread" &copy; 2026.</strong>
+    </footer>
+</div>
+
+<script src="/plugins/jquery/jquery.min.js"></script>
+<script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/dist/js/adminlte.min.js"></script>
+
+<!-- Script para cálculo automático (Lógica de Ingeniera) -->
+<script>
+    const productoSelect = document.getElementById('productoSelect');
+    const cantidadInput = document.getElementById('cantidadInput');
+    const totalInput = document.getElementById('totalInput');
+
+    function calcularTotal() {
+        const selectedOption = productoSelect.options[productoSelect.selectedIndex];
+        const precio = selectedOption.getAttribute('data-precio');
+        const cantidad = cantidadInput.value;
+
+        if (precio && cantidad) {
+            const total = parseFloat(precio) * parseInt(cantidad);
+            totalInput.value = total.toFixed(2);
+        }
+    }
+
+    productoSelect.addEventListener('change', calcularTotal);
+    cantidadInput.addEventListener('input', calcularTotal);
+</script>
+</body>
+</html>

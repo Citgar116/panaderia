@@ -88,10 +88,10 @@ public class AuthController {
     @PostMapping("/forgot")
     public String forgotPost(@RequestParam String correo, Model model) {
         try {
-            // Llamamos al servicio para enviar el correo real
             usuarioService.enviarCorreoRecuperacion(correo);
             model.addAttribute("mensaje", "Te hemos enviado un correo con tu contraseña.");
         } catch (Exception e) {
+            e.printStackTrace();
             model.addAttribute("error", e.getMessage());
         }
         return "forgot-password-v2";

@@ -58,7 +58,15 @@ public class UsuarioService {
             mensaje.setSubject("Recuperacion de contraseña - Panaderia - Cook and Bread");
             mensaje.setText("Hola " + usuario.getNombre() + ",\n\n" + "Tu contraseña actual es: " + usuario.getContrasena() + "\n\n" + "Te recomendamos cambiarla pronto por seguridad.");
 
-            mailSender.send(mensaje);
+            try {
+                System.out.println("Intentando enviar correo...");
+                mailSender.send(mensaje);
+                System.out.println("Correo enviado!");
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e;
+            }
+
         } else {
             throw new Exception("No se encontro ningun usuario con este correo.");
         }

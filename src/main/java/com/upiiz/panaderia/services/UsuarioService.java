@@ -69,7 +69,7 @@ public class UsuarioService {
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             String body = "{\n" +
-                    "  \"from\": \"panaderiacokkieandbread@gmail.com\",\n" +
+                    "  \"from\": \"onboarding@resend.dev\",\n" +
                     "  \"to\": [\"" + correo + "\"],\n" +
                     "  \"subject\": \"Recuperacion de contraseña - Panaderia\",\n" +
                     "  \"text\": \"" + mensajeTexto.replace("\n", "\\n") + "\"\n" +

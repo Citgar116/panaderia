@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
@@ -47,28 +49,41 @@ public class UsuarioService {
         }
     }
 
+
     public void enviarCorreoRecuperacion(String correo) throws Exception {
         Optional<UsuarioEntity> usuarioOpt = usuarioRepository.findByCorreo(correo);
 
-        if (usuarioOpt.isPresent()){
+        if (usuarioOpt.isPresent()) {
             UsuarioEntity usuario = usuarioOpt.get();
 
-            SimpleMailMessage mensaje = new SimpleMailMessage();
-            mensaje.setTo(correo);
-            mensaje.setSubject("Recuperacion de contraseña - Panaderia - Cook and Bread");
-            mensaje.setText("Hola " + usuario.getNombre() + ",\n\n" + "Tu contraseña actual es: " + usuario.getContrasena() + "\n\n" + "Te recomendamos cambiarla pronto por seguridad.");
+            String mensajeTexto = "Hola " + usuario.getNombre() + ",\n\n" +
+                    "Tu contraseña actual es: " + usuario.getContrasena() + "\n\n" +
+                    "Te recomendamos cambiarla pronto por seguridad.";
 
-            try {
-                System.out.println("Intentando enviar correo...");
-                mailSender.send(mensaje);
-                System.out.println("Correo enviado!");
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw e;
-            }
+            RestTemplate restTemplate = new RestTemplate();
+
+            String url = "https://api.resend.com/emails";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + System.getenv("RESEND_API_KEY"));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            String body = "{\n" +
+                    "  \"from\": \"onboarding@resend.dev\",\n" +
+                    "  \"to\": [\"" + correo + "\"],\n" +
+                    "  \"subject\": \"Recuperacion de contraseña - Panaderia\",\n" +
+                    "  \"text\": \"" + mensajeTexto.replace("\n", "\\n") + "\"\n" +
+                    "}";
+
+            HttpEntity<String> request = new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+            System.out.println("Status: " + response.getStatusCode());
 
         } else {
-            throw new Exception("No se encontro ningun usuario con este correo.");
+            throw new Exception("No se encontró ningún usuario con este correo.");
         }
     }
+
 }
